@@ -8,8 +8,10 @@
 
 #import <Cocoa/Cocoa.h>
 
+@class LCView;
+
 @interface ViewController : NSViewController
 
+@property (weak) IBOutlet LCView *controlView;
 
 @end
-

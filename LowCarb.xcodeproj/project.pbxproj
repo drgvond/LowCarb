@@ -12,6 +12,8 @@
 		06433DE41FD74C6000C36D60 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 06433DE31FD74C6000C36D60 /* Assets.xcassets */; };
 		06433DE71FD74C6000C36D60 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 06433DE51FD74C6000C36D60 /* Main.storyboard */; };
 		06433DEA1FD74C6000C36D60 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 06433DE91FD74C6000C36D60 /* main.m */; };
+		06433DF31FD74EEA00C36D60 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 06433DF21FD74EDA00C36D60 /* Carbon.framework */; settings = {ATTRIBUTES = (Required, ); }; };
+		06433DF61FD74FB400C36D60 /* LCView.m in Sources */ = {isa = PBXBuildFile; fileRef = 06433DF51FD74FB400C36D60 /* LCView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +27,9 @@
 		06433DE81FD74C6000C36D60 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		06433DE91FD74C6000C36D60 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		06433DEB1FD74C6000C36D60 /* LowCarb.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LowCarb.entitlements; sourceTree = "<group>"; };
+		06433DF21FD74EDA00C36D60 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
+		06433DF41FD74FB400C36D60 /* LCView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LCView.h; sourceTree = "<group>"; };
+		06433DF51FD74FB400C36D60 /* LCView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LCView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +37,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				06433DF31FD74EEA00C36D60 /* Carbon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -43,6 +49,7 @@
 			children = (
 				06433DDC1FD74C6000C36D60 /* LowCarb */,
 				06433DDB1FD74C6000C36D60 /* Products */,
+				06433DF11FD74EDA00C36D60 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -59,6 +66,8 @@
 			children = (
 				06433DDD1FD74C6000C36D60 /* AppDelegate.h */,
 				06433DDE1FD74C6000C36D60 /* AppDelegate.m */,
+				06433DF41FD74FB400C36D60 /* LCView.h */,
+				06433DF51FD74FB400C36D60 /* LCView.m */,
 				06433DE01FD74C6000C36D60 /* ViewController.h */,
 				06433DE11FD74C6000C36D60 /* ViewController.m */,
 				06433DE31FD74C6000C36D60 /* Assets.xcassets */,
@@ -68,6 +77,14 @@
 				06433DEB1FD74C6000C36D60 /* LowCarb.entitlements */,
 			);
 			path = LowCarb;
+			sourceTree = "<group>";
+		};
+		06433DF11FD74EDA00C36D60 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				06433DF21FD74EDA00C36D60 /* Carbon.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -141,6 +158,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				06433DE21FD74C6000C36D60 /* ViewController.m in Sources */,
+				06433DF61FD74FB400C36D60 /* LCView.m in Sources */,
 				06433DEA1FD74C6000C36D60 /* main.m in Sources */,
 				06433DDF1FD74C6000C36D60 /* AppDelegate.m in Sources */,
 			);

@@ -7,13 +7,14 @@
 //
 
 #import "ViewController.h"
+#import "LCView.h"
 
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    // Do any additional setup after loading the view.
+    [self.controlView controlTypeSelected:nil];
 }
 
 
@@ -22,6 +23,5 @@
 
     // Update the view, if already loaded.
 }
-
 
 @end
