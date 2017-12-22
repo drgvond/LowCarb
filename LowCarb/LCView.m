@@ -8,6 +8,16 @@
 
 #import "LCView.h"
 
+@interface NSComboBoxCell (ButtonCell)
+@property (readonly) NSButtonCell *buttonCell;
+@end
+
+@implementation NSComboBoxCell (ButtonCell)
+- (NSButtonCell *)buttonCell {
+    return self->_buttonCell;
+}
+@end
+
 @implementation LCView
 
 - (void)awakeFromNib {
@@ -46,6 +56,7 @@
     if (!self.control)
         return;
 
+    // Direct draw on the left hand side
     [self drawControl];
 
     if (!self.backingStore.data)
@@ -62,10 +73,11 @@
                                                    kCGImageAlphaPremultipliedFirst | kCGBitmapByteOrder32Host);
     CGColorSpaceRelease(bsCS);
 
+    // First, draw into the backing store
     [NSGraphicsContext saveGraphicsState];
     NSGraphicsContext.currentContext =
         [NSGraphicsContext graphicsContextWithCGContext:bsContext
-                                                flipped:YES];
+                                                flipped:NO];
     [NSColor.clearColor setFill];
     NSRectFill(CGRectMake(0, 0, self.backingStore.width, self.backingStore.height));
     const CGFloat scalingFactor = self.window.backingScaleFactor;
@@ -76,6 +88,7 @@
     CGImageRef bsImage = CGBitmapContextCreateImage(bsContext);
     CGContextRelease(bsContext);
 
+    // ... then, draw the backing store on the right hand side
     CGContextRef ctx = NSGraphicsContext.currentContext.CGContext;
     CGContextSaveGState(ctx);
     CGContextScaleCTM(ctx, 1.0 / scalingFactor, 1.0 / scalingFactor);
@@ -84,10 +97,19 @@
 }
 
 - (void)drawControl {
+    CGRect controlFrame = CGRectMake(20, 20, 100, self.frameHeightSlider.intValue);
+
+    NSGraphicsContext *nsCtx = NSGraphicsContext.currentContext;
+    CGContextRef ctx = nsCtx.CGContext;
+    [NSGraphicsContext saveGraphicsState];
+    CGContextSaveGState(ctx);
+
+    CGContextTranslateCTM(ctx, 0, CGRectGetHeight(controlFrame));
+    CGContextScaleCTM(ctx, 1, -1);
+    CGContextTranslateCTM(ctx, 0, -CGRectGetHeight(controlFrame));
+
     [self addSubview:self.control];
     self.control.enabled = self.enabledCheckbox.state == NSControlStateValueOn;
-
-    CGRect controlFrame = CGRectMake(20, 20, 100, self.frameHeightSlider.intValue);
 
     if (self.boudingRectsCheckbox.state == NSControlStateValueOn) {
         [[NSColor.redColor colorWithAlphaComponent:0.5] setFill];
@@ -96,14 +118,15 @@
         [[NSColor.yellowColor colorWithAlphaComponent:0.5] setFill];
         NSRectFillUsingOperation([self.control alignmentRectForFrame:controlFrame], NSCompositingOperationSourceOver);
 
-        CGRect drawingBounds = [self.control.cell drawingRectForBounds:CGRectMake(0, 0, 100, 26)];
+        CGRect drawingBounds = [self.control.cell drawingRectForBounds:CGRectMake(0,
+                                                                                  0,
+                                                                                  CGRectGetWidth(controlFrame),
+                                                                                  CGRectGetHeight(controlFrame))];
         [[NSColor.greenColor colorWithAlphaComponent:0.5] setFill];
         drawingBounds.origin.x += controlFrame.origin.x;
         drawingBounds.origin.y += controlFrame.origin.y;
         NSRectFillUsingOperation(drawingBounds, NSCompositingOperationSourceOver);
     }
-
-//    self.control.cell.highlighted = self.pressedCheckbox.state == NSControlStateValueOn;
 
     if ([self.control isKindOfClass:NSButton.class]) {
         NSButton *button = (NSButton *)self.control;
@@ -116,31 +139,33 @@
             [button.cell drawBezelWithFrame:controlFrame inView:self.control];
     } else {
         if (self.controlType == ComboBox) {
-            CGPoint dropDownPoint = CGPointMake(controlFrame.origin.x + self.control.frame.size.width - 10,
-                                                controlFrame.origin.y + self.control.frame.size.height / 2.0);
+#if 0
+            CGPoint buttonPoint = CGPointMake(controlFrame.size.width - 10,
+                                                controlFrame.size.height / 2.0);
             if (self.pressedCheckbox.state == NSControlStateValueOn)
-                [self.control.cell startTrackingAt:dropDownPoint inView:self];
+                [self.control.cell startTrackingAt:buttonPoint inView:self];
             else if (self.pressedCheckbox.state == NSControlStateValueOff)
-                [self.control.cell stopTracking:dropDownPoint at:dropDownPoint inView:self mouseIsUp:YES];
+                [self.control.cell stopTracking:buttonPoint at:buttonPoint inView:self.control mouseIsUp:YES];
+#else
+            NSComboBoxCell *cbCell = (NSComboBoxCell *)self.control.cell;
+            cbCell.buttonCell.highlighted = self.pressedCheckbox.state == NSControlStateValueOn;
+#endif
         }
         [self.control.cell drawWithFrame:controlFrame inView:self.control];
     }
 
     if (self.focusRingCheckbox.state == NSControlStateValueOn) {
-        NSGraphicsContext *nsCtx = NSGraphicsContext.currentContext;
-        CGContextRef ctx = nsCtx.CGContext;
-        [NSGraphicsContext saveGraphicsState];
-        CGContextSaveGState(ctx);
         NSSetFocusRingStyle(NSFocusRingOnly);
         CGContextBeginTransparencyLayerWithRect(ctx, controlFrame, nil);
         self.control.cell.showsFirstResponder = YES;
         [self.control.cell drawFocusRingMaskWithFrame:controlFrame inView:self.control];
         CGContextEndTransparencyLayer(ctx);
-        CGContextRestoreGState(ctx);
-        [NSGraphicsContext restoreGraphicsState];
     } else {
         [self.control drawFocusRingMask];
     }
+
+    CGContextRestoreGState(ctx);
+    [NSGraphicsContext restoreGraphicsState];
 
     [self.control removeFromSuperviewWithoutNeedingDisplay];
 }
