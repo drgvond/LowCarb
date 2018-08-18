@@ -104,9 +104,11 @@
     [NSGraphicsContext saveGraphicsState];
     CGContextSaveGState(ctx);
 
-    CGContextTranslateCTM(ctx, 0, CGRectGetHeight(controlFrame));
-    CGContextScaleCTM(ctx, 1, -1);
-    CGContextTranslateCTM(ctx, 0, -CGRectGetHeight(controlFrame));
+    if (self.controlType != Box) {
+        CGContextTranslateCTM(ctx, 0, CGRectGetHeight(controlFrame));
+        CGContextScaleCTM(ctx, 1, -1);
+        CGContextTranslateCTM(ctx, 0, -CGRectGetHeight(controlFrame));
+    }
 
     [self addSubview:self.control];
     if (self.controlType != Box)
@@ -156,12 +158,12 @@
             cbCell.buttonCell.highlighted = self.pressedCheckbox.state == NSControlStateValueOn;
 #endif
         }
-        if (self.controlType != Box) {
+        if (self.controlType == Box) {
+            self.control.frame = controlFrame;
+            [self.control drawRect:controlFrame];
+        } else {
             NSControl *control = (NSControl *)self.control;
             [control.cell drawWithFrame:controlFrame inView:self.control];
-        } else {
-            self.control.bounds = CGRectInset(controlFrame, 10, 10);
-            [self.control drawRect:controlFrame];
         }
     }
 
@@ -193,7 +195,9 @@
     const NSControlSize oldControlSize = self.controlSize;
     self.controlType = sender ? [sender indexOfItem:sender.selectedItem] : Button;
     if (self.controlType == Box) {
-        self.control = [[NSBox alloc] init];
+        NSBox *box = [[NSBox alloc] init];
+        box.title = @"";
+        self.control = box;
     } else if (self.controlType == ComboBox) {
         self.control = [[NSComboBox alloc] init];
     } else if (self.controlType == TextField) {
