@@ -14,7 +14,7 @@
 
 @implementation NSComboBoxCell (ButtonCell)
 - (NSButtonCell *)buttonCell {
-    return self->_buttonCell;
+    return (NSButtonCell *)[self valueForKeyPath:@"_buttonCell"];
 }
 @end
 
