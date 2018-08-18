@@ -109,7 +109,8 @@
     CGContextTranslateCTM(ctx, 0, -CGRectGetHeight(controlFrame));
 
     [self addSubview:self.control];
-    self.control.enabled = self.enabledCheckbox.state == NSControlStateValueOn;
+    if (self.controlType != Box)
+        ((NSControl *)self.control).enabled = self.enabledCheckbox.state == NSControlStateValueOn;
 
     if (self.boudingRectsCheckbox.state == NSControlStateValueOn) {
         [[NSColor.redColor colorWithAlphaComponent:0.5] setFill];
@@ -118,10 +119,13 @@
         [[NSColor.yellowColor colorWithAlphaComponent:0.5] setFill];
         NSRectFillUsingOperation([self.control alignmentRectForFrame:controlFrame], NSCompositingOperationSourceOver);
 
-        CGRect drawingBounds = [self.control.cell drawingRectForBounds:CGRectMake(0,
-                                                                                  0,
-                                                                                  CGRectGetWidth(controlFrame),
-                                                                                  CGRectGetHeight(controlFrame))];
+        CGRect drawingBounds = CGRectMake(0,
+                                          0,
+                                          CGRectGetWidth(controlFrame),
+                                          CGRectGetHeight(controlFrame));
+        if (self.controlType != Box)
+            drawingBounds = [((NSControl *)self.control).cell drawingRectForBounds:drawingBounds];
+
         [[NSColor.greenColor colorWithAlphaComponent:0.5] setFill];
         drawingBounds.origin.x += controlFrame.origin.x;
         drawingBounds.origin.y += controlFrame.origin.y;
@@ -134,11 +138,12 @@
         button.state = self.onStateCheckbox.state;
 
         if (self.controlType == CheckBox || self.controlType == RadioButton)
-            [self.control.cell drawInteriorWithFrame:controlFrame inView:self.control];
+            [button.cell drawInteriorWithFrame:controlFrame inView:self.control];
         else
             [button.cell drawBezelWithFrame:controlFrame inView:self.control];
     } else {
         if (self.controlType == ComboBox) {
+            NSComboBox *cb = (NSComboBox *)self.control;
 #if 0
             CGPoint buttonPoint = CGPointMake(controlFrame.size.width - 10,
                                                 controlFrame.size.height / 2.0);
@@ -147,21 +152,30 @@
             else if (self.pressedCheckbox.state == NSControlStateValueOff)
                 [self.control.cell stopTracking:buttonPoint at:buttonPoint inView:self.control mouseIsUp:YES];
 #else
-            NSComboBoxCell *cbCell = (NSComboBoxCell *)self.control.cell;
+            NSComboBoxCell *cbCell = (NSComboBoxCell *)cb.cell;
             cbCell.buttonCell.highlighted = self.pressedCheckbox.state == NSControlStateValueOn;
 #endif
         }
-        [self.control.cell drawWithFrame:controlFrame inView:self.control];
+        if (self.controlType != Box) {
+            NSControl *control = (NSControl *)self.control;
+            [control.cell drawWithFrame:controlFrame inView:self.control];
+        } else {
+            self.control.bounds = CGRectInset(controlFrame, 10, 10);
+            [self.control drawRect:controlFrame];
+        }
     }
 
-    if (self.focusRingCheckbox.state == NSControlStateValueOn) {
-        NSSetFocusRingStyle(NSFocusRingOnly);
-        CGContextBeginTransparencyLayerWithRect(ctx, controlFrame, nil);
-        self.control.cell.showsFirstResponder = YES;
-        [self.control.cell drawFocusRingMaskWithFrame:controlFrame inView:self.control];
-        CGContextEndTransparencyLayer(ctx);
-    } else {
-        [self.control drawFocusRingMask];
+    if (self.controlType != Box) {
+        if (self.focusRingCheckbox.state == NSControlStateValueOn) {
+            NSSetFocusRingStyle(NSFocusRingOnly);
+            CGContextBeginTransparencyLayerWithRect(ctx, controlFrame, nil);
+            NSControl *control = (NSControl *)self.control;
+            control.cell.showsFirstResponder = YES;
+            [control.cell drawFocusRingMaskWithFrame:controlFrame inView:self.control];
+            CGContextEndTransparencyLayer(ctx);
+        } else {
+            [self.control drawFocusRingMask];
+        }
     }
 
     CGContextRestoreGState(ctx);
@@ -176,9 +190,11 @@
 }
 
 - (IBAction)controlTypeSelected:(NSPopUpButton *)sender {
-    const NSControlSize oldControlSize = self.control.controlSize;
+    const NSControlSize oldControlSize = self.controlSize;
     self.controlType = sender ? [sender indexOfItem:sender.selectedItem] : Button;
-    if (self.controlType == ComboBox) {
+    if (self.controlType == Box) {
+        self.control = [[NSBox alloc] init];
+    } else if (self.controlType == ComboBox) {
         self.control = [[NSComboBox alloc] init];
     } else if (self.controlType == TextField) {
         self.control = [[NSTextField alloc] init];
@@ -202,24 +218,34 @@
         button.title = @"";
         self.control = button;
     }
-    self.control.controlSize = oldControlSize;
+    
+    self.controlSize = oldControlSize;
+    if (self.controlType != Box) {
+        NSControl *control = (NSControl *)self.control;
+        control.controlSize = self.controlSize;
+    }
 
     [self redraw:sender];
 }
 
 - (IBAction)controlSizeSelected:(NSButton *)sender {
+    if (self.controlType == Box)
+        return;
+
     if (!self.control)
         [self controlTypeSelected:nil];
 
+    NSControl *control = (NSControl *)self.control;
+    
     switch (sender.tag) {
         case 0:
-            self.control.controlSize = NSControlSizeRegular;
+            control.controlSize = NSControlSizeRegular;
             break;
         case 1:
-            self.control.controlSize = NSControlSizeSmall;
+            control.controlSize = NSControlSizeSmall;
             break;
         case 2:
-            self.control.controlSize = NSControlSizeMini;
+            control.controlSize = NSControlSizeMini;
             break;
         default:
             break;

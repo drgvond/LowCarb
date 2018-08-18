@@ -20,6 +20,7 @@ struct BackingStore {
 };
 
 typedef NS_ENUM(NSInteger, ControlType) {
+    Box,
     Button,
     PopUpButton,
     PullDownButton,
@@ -31,8 +32,9 @@ typedef NS_ENUM(NSInteger, ControlType) {
 
 @interface LCView : NSView
 
-@property NSControl *control;
+@property NSView *control;
 @property ControlType controlType;
+@property NSControlSize controlSize;
 @property struct BackingStore backingStore;
 
 @property (weak) IBOutlet NSButton *boudingRectsCheckbox;
