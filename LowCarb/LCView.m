@@ -159,7 +159,6 @@
 #endif
         }
         if (self.controlType == Box) {
-            self.control.wantsLayer = YES;
             self.control.frame = controlFrame;
             if (@available(macOS 10.14, *))
                 [self.control displayRectIgnoringOpacity:self.control.bounds inContext:NSGraphicsContext.currentContext];
