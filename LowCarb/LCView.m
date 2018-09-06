@@ -18,6 +18,32 @@
 }
 @end
 
+@interface CustomNSBox : NSBox
+
+- (instancetype)init;
+- (void)drawRect:(NSRect)dirtyRect;
+
+@end
+
+@implementation CustomNSBox
+
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.title = @"";
+        self.titlePosition = NSNoTitle;
+    }
+
+    return self;
+}
+
+- (void)drawRect:(NSRect)dirtyRect {
+    [super drawRect:dirtyRect];
+}
+
+@end
+
+
 @implementation LCView
 
 - (void)awakeFromNib {
@@ -198,8 +224,7 @@
     const NSControlSize oldControlSize = self.controlSize;
     self.controlType = sender ? [sender indexOfItem:sender.selectedItem] : Button;
     if (self.controlType == Box) {
-        NSBox *box = [[NSBox alloc] init];
-        box.title = @"";
+        NSBox *box = [[CustomNSBox alloc] init];
         self.control = box;
     } else if (self.controlType == ComboBox) {
         self.control = [[NSComboBox alloc] init];
