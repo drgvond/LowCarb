@@ -186,10 +186,7 @@
         }
         if (self.controlType == Box) {
             self.control.frame = controlFrame;
-            if (@available(macOS 10.14, *))
-                [self.control displayRectIgnoringOpacity:self.control.bounds inContext:NSGraphicsContext.currentContext];
-            else
-                [self.control drawRect:controlFrame];
+            [self.control drawRect:controlFrame];
         } else {
             NSControl *control = (NSControl *)self.control;
             [control.cell drawWithFrame:controlFrame inView:self.control];
