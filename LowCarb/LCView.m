@@ -32,6 +32,15 @@
     if (self) {
         self.title = @"";
         self.titlePosition = NSNoTitle;
+#if 1
+        self.boxType = NSBoxPrimary;
+#else
+        // This works rather well in dark mode
+        self.boxType = NSBoxCustom;
+        self.cornerRadius = 3;
+        self.borderColor = [NSColor.controlColor colorWithAlphaComponent:0.1];
+        self.fillColor = [NSColor.darkGrayColor colorWithAlphaComponent:0.2];
+#endif
     }
 
     return self;
@@ -186,7 +195,7 @@
         }
         if (self.controlType == Box) {
             self.control.frame = controlFrame;
-            [self.control drawRect:controlFrame];
+            [self.control drawRect:self.control.bounds];
         } else {
             NSControl *control = (NSControl *)self.control;
             [control.cell drawWithFrame:controlFrame inView:self.control];
